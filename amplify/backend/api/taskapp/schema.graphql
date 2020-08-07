@@ -1,5 +1,27 @@
-type Registration @model {
+type Todo
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
   id: ID!
   name: String!
-  email: String
+  description: String
+  owner: String
+  comments: [Comment] @connection(keyName: "byTodo", fields: ["id"])
+}
+
+type Comment
+  @model
+  @key(name: "byTodo", fields: ["todoID"])
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
+  id: ID!
+  content: String
+  owner: String
+  todoID: ID!
+  likes: [Like] @connection(name: "CommentLikes")
+}
+type Like
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
+  id: ID!
+  owner: String
+  comment: Comment @connection(name: "CommentLikes")
 }

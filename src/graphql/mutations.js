@@ -1,43 +1,223 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createRegistration = /* GraphQL */ `
-  mutation CreateRegistration(
-    $input: CreateRegistrationInput!
-    $condition: ModelRegistrationConditionInput
+export const createTodo = /* GraphQL */ `
+  mutation CreateTodo(
+    $input: CreateTodoInput!
+    $condition: ModelTodoConditionInput
   ) {
-    createRegistration(input: $input, condition: $condition) {
+    createTodo(input: $input, condition: $condition) {
       id
       name
-      email
+      description
+      owner
+      comments {
+        items {
+          id
+          content
+          owner
+          todoID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
   }
 `;
-export const updateRegistration = /* GraphQL */ `
-  mutation UpdateRegistration(
-    $input: UpdateRegistrationInput!
-    $condition: ModelRegistrationConditionInput
+export const updateTodo = /* GraphQL */ `
+  mutation UpdateTodo(
+    $input: UpdateTodoInput!
+    $condition: ModelTodoConditionInput
   ) {
-    updateRegistration(input: $input, condition: $condition) {
+    updateTodo(input: $input, condition: $condition) {
       id
       name
-      email
+      description
+      owner
+      comments {
+        items {
+          id
+          content
+          owner
+          todoID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
   }
 `;
-export const deleteRegistration = /* GraphQL */ `
-  mutation DeleteRegistration(
-    $input: DeleteRegistrationInput!
-    $condition: ModelRegistrationConditionInput
+export const deleteTodo = /* GraphQL */ `
+  mutation DeleteTodo(
+    $input: DeleteTodoInput!
+    $condition: ModelTodoConditionInput
   ) {
-    deleteRegistration(input: $input, condition: $condition) {
+    deleteTodo(input: $input, condition: $condition) {
       id
       name
-      email
+      description
+      owner
+      comments {
+        items {
+          id
+          content
+          owner
+          todoID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createComment = /* GraphQL */ `
+  mutation CreateComment(
+    $input: CreateCommentInput!
+    $condition: ModelCommentConditionInput
+  ) {
+    createComment(input: $input, condition: $condition) {
+      id
+      content
+      owner
+      todoID
+      likes {
+        items {
+          id
+          owner
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateComment = /* GraphQL */ `
+  mutation UpdateComment(
+    $input: UpdateCommentInput!
+    $condition: ModelCommentConditionInput
+  ) {
+    updateComment(input: $input, condition: $condition) {
+      id
+      content
+      owner
+      todoID
+      likes {
+        items {
+          id
+          owner
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteComment = /* GraphQL */ `
+  mutation DeleteComment(
+    $input: DeleteCommentInput!
+    $condition: ModelCommentConditionInput
+  ) {
+    deleteComment(input: $input, condition: $condition) {
+      id
+      content
+      owner
+      todoID
+      likes {
+        items {
+          id
+          owner
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createLike = /* GraphQL */ `
+  mutation CreateLike(
+    $input: CreateLikeInput!
+    $condition: ModelLikeConditionInput
+  ) {
+    createLike(input: $input, condition: $condition) {
+      id
+      owner
+      comment {
+        id
+        content
+        owner
+        todoID
+        likes {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateLike = /* GraphQL */ `
+  mutation UpdateLike(
+    $input: UpdateLikeInput!
+    $condition: ModelLikeConditionInput
+  ) {
+    updateLike(input: $input, condition: $condition) {
+      id
+      owner
+      comment {
+        id
+        content
+        owner
+        todoID
+        likes {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteLike = /* GraphQL */ `
+  mutation DeleteLike(
+    $input: DeleteLikeInput!
+    $condition: ModelLikeConditionInput
+  ) {
+    deleteLike(input: $input, condition: $condition) {
+      id
+      owner
+      comment {
+        id
+        content
+        owner
+        todoID
+        likes {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
     }

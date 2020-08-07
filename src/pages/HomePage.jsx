@@ -1,155 +1,131 @@
 import React, { useEffect, useState } from "react";
 import { API, graphqlOperation } from "aws-amplify";
-import { createRegistration, deleteRegistration } from "../graphql/mutations";
-import { listRegistrations } from "../graphql/queries";
-import { PageHeader } from "antd";
-import { Card } from "antd";
-import { Button } from "antd";
-import { Input } from "antd";
-import "antd/dist/antd.css";
-import { Layout, Menu, Breadcrumb, Spin } from "antd";
+import { createTodo, deleteTodo } from "../graphql/mutations";
+import { listTodos } from "../graphql/queries";
 import { Link } from "react-router-dom";
+import { PageHeader } from "antd";
+import { Card, Button, Input } from "antd";
+import "antd/dist/antd.css";
+import { Layout, Spin } from "antd";
+import { Auth } from "aws-amplify";
 
-const { Header, Content, Footer } = Layout;
+const { Content } = Layout;
 
 const HomePage = () => {
-  const initialFormState = { name: "", email: "" };
+  const initialFormState = { name: "", description: "" };
   const loadingState = false;
+  const [currentUsername, setCurrentUsername] = useState("");
   const [formState, setFormState] = useState(initialFormState);
-  const [registrations, setRegistrations] = useState([]);
+  const [todos, setTodos] = useState([]);
   const [loadingComplete, setloadingComplete] = useState(loadingState);
 
   useEffect(() => {
-    fetchRegistrations();
+    fetchTodos();
   }, []);
 
   function setInput(key, value) {
     setFormState({ ...formState, [key]: value });
   }
 
-  async function fetchRegistrations() {
+  async function fetchTodos() {
     try {
-      const registrationDetails = await API.graphql(
-        graphqlOperation(listRegistrations)
-      );
-      const registrations = registrationDetails.data.listRegistrations.items;
-      setRegistrations(registrations);
+      const todoDetails = await API.graphql(graphqlOperation(listTodos));
+      const todos = todoDetails.data.listTodos.items;
+      setTodos(todos);
       setloadingComplete({ loadingComplete: true });
     } catch (err) {
-      console.log("error fetching registrations");
+      console.log("error fetching todos");
     }
   }
 
-  async function addRegistration() {
+  async function addTodo() {
     try {
-      if (!formState.name || !formState.email) return;
-      const registration = { ...formState };
-      setRegistrations([...registrations, registration]);
+      if (!formState.name || !formState.description) return;
+      const todo = { ...formState };
+      setTodos([...todos, todo]);
       setFormState(initialFormState);
-      await API.graphql(
-        graphqlOperation(createRegistration, { input: registration })
-      );
-      fetchRegistrations();
+      await API.graphql(graphqlOperation(createTodo, { input: todo }));
+      fetchTodos();
     } catch (err) {
-      console.log("error creating registration:", err);
+      console.log("error creating todo:", err);
     }
   }
 
-  async function removeRegistration(id) {
+  async function removeTodo(id) {
     try {
-      const registrationDetails = {
+      const todoDetails = {
         id
       };
-      setRegistrations(
-        registrations.filter(registration => registration.id !== id)
-      );
-      await API.graphql(
-        graphqlOperation(deleteRegistration, { input: registrationDetails })
-      );
+      setTodos(todos.filter(todo => todo.id !== id));
+      await API.graphql(graphqlOperation(deleteTodo, { input: todoDetails }));
     } catch (err) {
-      console.log("error removing registration:", err);
+      console.log("error removing todo:", err);
     }
   }
+
+  Auth.currentSession()
+    .then(data => setCurrentUsername(data.accessToken.payload.username))
+    .catch(err => console.log(err));
 
   return (
     <div>
-      <Footer className="layout" style={styles.layout}>
-        <Header>
-          <div className="logo" />
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["1"]}>
-            <Menu.Item key="1">
-              <Link to="/">Home</Link>
-            </Menu.Item>
-            <Menu.Item key="2">
-              <Link to="/about">About</Link>
-            </Menu.Item>
-          </Menu>
-        </Header>
-        <Content style={{ padding: "0 50px" }}>
-          <Breadcrumb style={{ margin: "16px 0" }}>
-            <Breadcrumb.Item>Sign Up</Breadcrumb.Item>
-          </Breadcrumb>
-          <div className="site-layout-content">
-            <PageHeader
-              className="site-page-header"
-              title="Steve's PoC Portal"
-              subTitle="powered By AWS Amplify"
-              style={styles.header}
+      <Content style={{ padding: "0 50px" }}>
+        <div className="site-layout-content">
+          <PageHeader
+            className="site-page-header"
+            title={"Welcome " + currentUsername}
+            subTitle="To-do list powered by AWS Amplify"
+            style={styles.header}
+          />
+          <div>
+            <Input
+              onChange={event => setInput("name", event.target.value)}
+              value={formState.name}
+              placeholder="Name"
+              style={styles.input}
             />
-            <div>
-              <Input
-                onChange={event => setInput("name", event.target.value)}
-                value={formState.name}
-                placeholder="Name"
-                style={styles.input}
-              />
-              <Input
-                onChange={event => setInput("email", event.target.value)}
-                value={formState.email}
-                placeholder="Email"
-                style={styles.input}
-              />
-              <Button
-                onClick={addRegistration}
-                type="primary"
-                style={styles.submit}
-              >
-                Sign Up
-              </Button>
-            </div>
-            {loadingComplete ? (
-              <div>
-                {registrations.map((registration, index) => (
-                  <Card
-                    key={registration.id ? registration.id : index}
-                    title={registration.name}
-                    style={{ width: 300 }}
-                  >
-                    <p>{registration.email}</p>
-                    <Button
-                      type="primary"
-                      onClick={() => removeRegistration(registration.id)}
-                    >
-                      Remove
-                    </Button>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Spin />
-            )}
+            <Input
+              onChange={event => setInput("description", event.target.value)}
+              value={formState.description}
+              placeholder="Description"
+              style={styles.input}
+            />
+            <Button onClick={addTodo} type="primary" style={styles.submit}>
+              Add
+            </Button>
           </div>
-        </Content>
-        <Footer style={{ textAlign: "center" }}>Matthew Lau ©2020</Footer>
-      </Footer>
+          {loadingComplete ? (
+            <div>
+              {todos.map((todo, index) => (
+                <Card
+                  key={todo.id ? todo.id : index}
+                  title={todo.name}
+                  style={{ width: 300 }}
+                >
+                  <p>{todo.description}</p>
+                  {currentUsername === todo.owner && (
+                    <Button type="primary" onClick={() => removeTodo(todo.id)}>
+                      Done
+                    </Button>
+                  )}
+                  <Button>
+                    <Link className="button" to={`/edit/${todo.id}`}>
+                      More
+                    </Link>
+                  </Button>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Spin />
+          )}
+        </div>
+      </Content>
     </div>
   );
 };
 
 const styles = {
-  layout: {
-    minHeight: "100vh"
-  },
   input: {
     margin: "10px 0"
   },
